@@ -1,6 +1,7 @@
 package paper_client
 
 import (
+	"errors"
 	"internal/sheet_writer"
 	"internal/sheet_reader"
 	"internal/tcp_client"
@@ -46,6 +47,12 @@ func Connect(host string, port uint32) (*PaperClient, error) {
 
 	client := PaperClient {
 		tcp_client,
+	}
+
+	_, ping_err := client.Ping()
+
+	if ping_err != nil {
+		return nil, errors.New("Connection refused.")
 	}
 
 	return &client, nil
