@@ -25,13 +25,14 @@ const (
 
 	HAS uint8 = 5
 	PEEK uint8 = 6
+	TTL uint8 = 7
 
-	WIPE uint8 = 7
+	WIPE uint8 = 8
 
-	RESIZE uint8 = 8
-	POLICY uint8 = 9
+	RESIZE uint8 = 9
+	POLICY uint8 = 10
 
-	STATS uint8 = 10
+	STATS uint8 = 11
 )
 
 type PaperClient struct {
@@ -200,6 +201,30 @@ func (client *PaperClient) Peek(key string) (*response.Response[string], error) 
 	sheet_writer := sheet_writer.New()
 	sheet_writer.WriteU8(PEEK)
 	sheet_writer.WriteString(key)
+
+	client.tcp_client.Send(sheet_writer)
+
+	sheet_reader := sheet_reader.New(client.tcp_client)
+	is_ok, err := sheet_reader.ReadBool()
+
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := sheet_reader.ReadString()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response.New(is_ok, data), nil
+}
+
+func (client *PaperClient) Ttl(key string, ttl uint32) (*response.Response[string], error) {
+	sheet_writer := sheet_writer.New()
+	sheet_writer.WriteU8(TTL)
+	sheet_writer.WriteString(key)
+	sheet_writer.WriteU32(ttl)
 
 	client.tcp_client.Send(sheet_writer)
 

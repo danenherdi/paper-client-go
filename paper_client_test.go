@@ -214,6 +214,35 @@ func TestPeekNonExistent(t *testing.T) {
 	}
 }
 
+func TestTtlExistent(t *testing.T) {
+	client := GetClient(t)
+
+	client.Set("key", "value", 0)
+	response, _ := client.Ttl("key", 5)
+
+	if !response.IsOk() {
+		t.Error("ttl returned not ok for a key which exists")
+	}
+
+	if response.Data() != "done" {
+		t.Error("ttl for a key which exists did not return \"done\"")
+	}
+}
+
+func TestTtlNonExistent(t *testing.T) {
+	client := GetClient(t)
+
+	response, _ := client.Ttl("key", 5)
+
+	if response.IsOk() {
+		t.Error("ttl returned ok for a key which does not exist")
+	}
+
+	if len(response.Data()) == 0 {
+		t.Error("ttl for key which does not exist did not return error message")
+	}
+}
+
 func TestWipe(t *testing.T) {
 	client := GetClient(t)
 
