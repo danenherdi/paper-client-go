@@ -41,7 +41,9 @@ func Connect(host string, port uint32, size uint32) (*PaperPool, error) {
 
 func (pool *PaperPool) Client() (*paper_client.PaperClient) {
 	client := pool.clients[pool.index]
-	atomic.AddUint32(&pool.index, 1)
+
+	new_index := (pool.index + 1) % uint32(len(pool.clients))
+	atomic.StoreUint32(&pool.index, new_index)
 
 	return client
 }
