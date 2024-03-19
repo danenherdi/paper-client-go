@@ -1,8 +1,8 @@
 package response
 
 type Response[T any] struct {
-	is_ok bool
-	data T
+	data *T
+	err_data *string
 }
 
 type StatsData struct {
@@ -19,22 +19,26 @@ type StatsData struct {
 	uptime uint64
 }
 
-func New[T any](is_ok bool, data T) *Response[T] {
+func New[T any](data *T, err_data *string) *Response[T] {
 	return &Response[T] {
-		is_ok,
 		data,
+		err_data,
 	}
 }
 
 func (response *Response[T]) IsOk() bool {
-	return response.is_ok
+	return response.err_data == nil
 }
 
-func (response *Response[T]) Data() T {
+func (response *Response[T]) Data() *T {
 	return response.data
 }
 
-func NewStatsResponse(
+func (response *Response[T]) ErrData() *string {
+	return response.err_data
+}
+
+func NewStatsData(
 	max_size uint64,
 	used_size uint64,
 
@@ -46,24 +50,20 @@ func NewStatsResponse(
 
 	policy uint8,
 	uptime uint64,
-) *Response[StatsData] {
-	return New(
-		true,
+) StatsData {
+	return StatsData {
+		max_size,
+		used_size,
 
-		StatsData {
-			max_size,
-			used_size,
+		total_gets,
+		total_sets,
+		total_dels,
 
-			total_gets,
-			total_sets,
-			total_dels,
+		miss_ratio,
 
-			miss_ratio,
-
-			policy,
-			uptime,
-		},
-	)
+		policy,
+		uptime,
+	}
 }
 
 func (stats StatsData) MaxSize() uint64 {

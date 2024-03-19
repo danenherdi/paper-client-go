@@ -1,4 +1,4 @@
-module github.com/Paper-Book/paper-client-go
+module github.com/Paper-Book/paper-client-go/client
 
 go 1.18
 
