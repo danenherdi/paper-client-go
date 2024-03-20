@@ -6,18 +6,21 @@ import (
 
 func TestClient(t *testing.T) {
 	pool, _ := Connect("127.0.0.1", 3145, 2)
-	lockable_client := pool.LockableClient()
 
-	client := lockable_client.Lock()
-	defer lockable_client.Unlock()
+	for i := 0; i < 10; i++ {
+		lockable_client := pool.LockableClient()
 
-	response, _ := client.Ping()
+		client := lockable_client.Lock()
+		response, _ := client.Ping()
 
-	if !response.IsOk() {
-		t.Error("pool client ping returned not ok")
-	}
+		if !response.IsOk() {
+			t.Error("pool client ping returned not ok")
+		}
 
-	if *response.Data() != "pong" {
-		t.Error("pool client ping did not return pong")
+		if *response.Data() != "pong" {
+			t.Error("pool client ping did not return pong")
+		}
+
+		lockable_client.Unlock()
 	}
 }

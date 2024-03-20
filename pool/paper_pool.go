@@ -19,7 +19,7 @@ type LockableClient struct {
 func Connect(host string, port uint32, size uint32) (*PaperPool, error) {
 	clients := []*LockableClient{}
 
-	for i := uint32(0); i<size; i++ {
+	for i := uint32(0); i < size; i++ {
 		client, err := paper_client.Connect(host, port)
 
 		if err != nil {
