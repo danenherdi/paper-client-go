@@ -6,7 +6,10 @@ import (
 
 func TestClient(t *testing.T) {
 	pool, _ := Connect("127.0.0.1", 3145, 2)
-	client := pool.Client()
+	lockable_client := pool.LockableClient()
+
+	client := lockable_client.Lock()
+	defer lockable_client.Unlock()
 
 	response, _ := client.Ping()
 
