@@ -46,6 +46,22 @@ func Connect(host string, port uint32, size uint32) (*PaperPool, error) {
 	return &pool, nil
 }
 
+func (pool *PaperPool) Disconnect() {
+	for _, lockable_client := range pool.clients {
+		client := lockable_client.Lock()
+		client.Disconnect()
+		lockable_client.Unlock()
+	}
+}
+
+func (pool *PaperPool) Auth(token string) () {
+	for _, lockable_client := range pool.clients {
+		client := lockable_client.Lock()
+		client.Auth(token)
+		lockable_client.Unlock()
+	}
+}
+
 func (pool *PaperPool) LockableClient() (*LockableClient) {
 	client := pool.clients[pool.index]
 

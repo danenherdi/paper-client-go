@@ -19,21 +19,23 @@ const (
 	PING uint8 = 0
 	VERSION uint8 = 1
 
-	GET uint8 = 2
-	SET uint8 = 3
-	DEL uint8 = 4
+	AUTH uint8 = 2
 
-	HAS uint8 = 5
-	PEEK uint8 = 6
-	TTL uint8 = 7
-	SIZE uint8 = 8
+	GET uint8 = 3
+	SET uint8 = 4
+	DEL uint8 = 5
 
-	WIPE uint8 = 9
+	HAS uint8 = 6
+	PEEK uint8 = 7
+	TTL uint8 = 8
+	SIZE uint8 = 9
 
-	RESIZE uint8 = 10
-	POLICY uint8 = 11
+	WIPE uint8 = 10
 
-	STATS uint8 = 12
+	RESIZE uint8 = 11
+	POLICY uint8 = 12
+
+	STATS uint8 = 13
 )
 
 type PaperClient struct {
@@ -58,6 +60,10 @@ func Connect(host string, port uint32) (*PaperClient, error) {
 	}
 
 	return &client, nil
+}
+
+func (client *PaperClient) Disconnect() {
+	client.tcp_client.GetConn().Close()
 }
 
 func (client *PaperClient) Ping() (*response.Response[string], error) {
@@ -103,6 +109,47 @@ func (client *PaperClient) Ping() (*response.Response[string], error) {
 func (client *PaperClient) Version() (*response.Response[string], error) {
 	sheet_writer := sheet_writer.New()
 	sheet_writer.WriteU8(VERSION)
+
+	client.tcp_client.Send(sheet_writer)
+
+	sheet_reader := sheet_reader.New(client.tcp_client)
+	is_ok, err := sheet_reader.ReadBool()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var ok_data *string
+	var err_data *string
+
+	ok_data = nil
+	err_data = nil
+
+	if is_ok {
+		ok_response_data, err := sheet_reader.ReadString()
+
+		if err != nil {
+			return nil, err
+		}
+
+		ok_data = &ok_response_data
+	} else {
+		err_response_data, err := sheet_reader.ReadString()
+
+		if err != nil {
+			return nil, err
+		}
+
+		err_data = &err_response_data
+	}
+
+	return response.New(ok_data, err_data), nil
+}
+
+func (client *PaperClient) Auth(token string) (*response.Response[string], error) {
+	sheet_writer := sheet_writer.New()
+	sheet_writer.WriteU8(AUTH)
+	sheet_writer.WriteString(token)
 
 	client.tcp_client.Send(sheet_writer)
 

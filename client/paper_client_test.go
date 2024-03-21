@@ -7,7 +7,8 @@ import (
 )
 
 func TestPing(t *testing.T) {
-	client := GetClient(t)
+	client := InitClient(t, true)
+	defer client.Disconnect()
 
 	response, _ := client.Ping()
 
@@ -21,7 +22,8 @@ func TestPing(t *testing.T) {
 }
 
 func TestVersion(t *testing.T) {
-	client := GetClient(t)
+	client := InitClient(t, true)
+	defer client.Disconnect()
 
 	response, _ := client.Version()
 
@@ -34,8 +36,35 @@ func TestVersion(t *testing.T) {
 	}
 }
 
+func TestAuthIncorrect(t *testing.T) {
+	client := InitClient(t, false)
+	defer client.Disconnect()
+
+	response, _ := client.Auth("incorrect_auth_token")
+
+	if response.IsOk() {
+		t.Error("auth with incorrect token returned ok")
+	}
+}
+
+func TestAuthCorrect(t *testing.T) {
+	client := InitClient(t, false)
+	defer client.Disconnect()
+
+	response, _ := client.Auth("auth_token")
+
+	if !response.IsOk() {
+		t.Error("auth with correct token returned not ok")
+	}
+
+	if *response.Data() != "done" {
+		t.Error("auth with correct token did not return \"done\"")
+	}
+}
+
 func TestGetExistent(t *testing.T) {
-	client := GetClient(t)
+	client := InitClient(t, true)
+	defer client.Disconnect()
 
 	client.Set("key", "value", 0)
 	response, _ := client.Get("key")
@@ -50,7 +79,8 @@ func TestGetExistent(t *testing.T) {
 }
 
 func TestGetNonExistent(t *testing.T) {
-	client := GetClient(t)
+	client := InitClient(t, true)
+	defer client.Disconnect()
 
 	response, _ := client.Get("key")
 
@@ -64,7 +94,8 @@ func TestGetNonExistent(t *testing.T) {
 }
 
 func TestSetNoTtl(t *testing.T) {
-	client := GetClient(t)
+	client := InitClient(t, true)
+	defer client.Disconnect()
 
 	response, _ := client.Set("key", "value", 0)
 
@@ -78,7 +109,8 @@ func TestSetNoTtl(t *testing.T) {
 }
 
 func TestSetTtl(t *testing.T) {
-	client := GetClient(t)
+	client := InitClient(t, true)
+	defer client.Disconnect()
 
 	response, _ := client.Set("key", "value", 1)
 
@@ -92,7 +124,8 @@ func TestSetTtl(t *testing.T) {
 }
 
 func TestSetTtlExpiry(t *testing.T) {
-	client := GetClient(t)
+	client := InitClient(t, true)
+	defer client.Disconnect()
 
 	response, _ := client.Set("key", "value", 1)
 
@@ -128,7 +161,8 @@ func TestSetTtlExpiry(t *testing.T) {
 }
 
 func TestDelExistent(t *testing.T) {
-	client := GetClient(t)
+	client := InitClient(t, true)
+	defer client.Disconnect()
 
 	client.Set("key", "value", 0)
 	response, _ := client.Del("key")
@@ -143,7 +177,8 @@ func TestDelExistent(t *testing.T) {
 }
 
 func TestDelNonExistent(t *testing.T) {
-	client := GetClient(t)
+	client := InitClient(t, true)
+	defer client.Disconnect()
 
 	response, _ := client.Del("key")
 
@@ -157,7 +192,8 @@ func TestDelNonExistent(t *testing.T) {
 }
 
 func TestHasExistent(t *testing.T) {
-	client := GetClient(t)
+	client := InitClient(t, true)
+	defer client.Disconnect()
 
 	client.Set("key", "value", 0)
 	response, _ := client.Has("key")
@@ -172,7 +208,8 @@ func TestHasExistent(t *testing.T) {
 }
 
 func TestHasNonExistent(t *testing.T) {
-	client := GetClient(t)
+	client := InitClient(t, true)
+	defer client.Disconnect()
 
 	response, _ := client.Has("key")
 
@@ -186,7 +223,8 @@ func TestHasNonExistent(t *testing.T) {
 }
 
 func TestPeekExistent(t *testing.T) {
-	client := GetClient(t)
+	client := InitClient(t, true)
+	defer client.Disconnect()
 
 	client.Set("key", "value", 0)
 	response, _ := client.Peek("key")
@@ -201,7 +239,8 @@ func TestPeekExistent(t *testing.T) {
 }
 
 func TestPeekNonExistent(t *testing.T) {
-	client := GetClient(t)
+	client := InitClient(t, true)
+	defer client.Disconnect()
 
 	response, _ := client.Peek("key")
 
@@ -215,7 +254,8 @@ func TestPeekNonExistent(t *testing.T) {
 }
 
 func TestTtlExistent(t *testing.T) {
-	client := GetClient(t)
+	client := InitClient(t, true)
+	defer client.Disconnect()
 
 	client.Set("key", "value", 0)
 	response, _ := client.Ttl("key", 5)
@@ -230,7 +270,8 @@ func TestTtlExistent(t *testing.T) {
 }
 
 func TestTtlNonExistent(t *testing.T) {
-	client := GetClient(t)
+	client := InitClient(t, true)
+	defer client.Disconnect()
 
 	response, _ := client.Ttl("key", 5)
 
@@ -244,7 +285,8 @@ func TestTtlNonExistent(t *testing.T) {
 }
 
 func TestSizeExistent(t *testing.T) {
-	client := GetClient(t)
+	client := InitClient(t, true)
+	defer client.Disconnect()
 
 	client.Set("key", "value", 0)
 	response, _ := client.Size("key")
@@ -259,7 +301,8 @@ func TestSizeExistent(t *testing.T) {
 }
 
 func TestSizeNonExistent(t *testing.T) {
-	client := GetClient(t)
+	client := InitClient(t, true)
+	defer client.Disconnect()
 
 	response, _ := client.Size("key")
 
@@ -273,7 +316,8 @@ func TestSizeNonExistent(t *testing.T) {
 }
 
 func TestWipe(t *testing.T) {
-	client := GetClient(t)
+	client := InitClient(t, true)
+	defer client.Disconnect()
 
 	client.Set("key", "value", 0)
 	response, _ := client.Wipe()
@@ -301,7 +345,8 @@ func TestResize(t *testing.T) {
 	var INITIAL_SIZE = uint64(10 * math.Pow(1024, 2))
 	var UPDATED_SIZE = uint64(20 * math.Pow(1024, 2))
 
-	client := GetClient(t)
+	client := InitClient(t, true)
+	defer client.Disconnect()
 
 	initial, _ := client.Resize(INITIAL_SIZE)
 
@@ -313,7 +358,7 @@ func TestResize(t *testing.T) {
 		t.Error("resize did not return \"done\"")
 	}
 
-	if GetCacheSize() != INITIAL_SIZE {
+	if GetCacheSize(client) != INITIAL_SIZE {
 		t.Error("cache has incorrect initial size")
 	}
 
@@ -327,7 +372,7 @@ func TestResize(t *testing.T) {
 		t.Error("resize did not return \"done\"")
 	}
 
-	if GetCacheSize() != UPDATED_SIZE {
+	if GetCacheSize(client) != UPDATED_SIZE {
 		t.Error("cache has incorrect updated size")
 	}
 }
@@ -336,7 +381,8 @@ func TestPolicy(t *testing.T) {
 	var INITIAL_POLICY = POLICY_LFU
 	var UPDATED_POLICY = POLICY_LRU
 
-	client := GetClient(t)
+	client := InitClient(t, true)
+	defer client.Disconnect()
 
 	initial, _ := client.Policy(INITIAL_POLICY)
 
@@ -348,7 +394,7 @@ func TestPolicy(t *testing.T) {
 		t.Error("policy did not return \"done\"")
 	}
 
-	if GetCachePolicy() != INITIAL_POLICY {
+	if GetCachePolicy(client) != INITIAL_POLICY {
 		t.Error("cache has incorrect initial policy")
 	}
 
@@ -362,13 +408,14 @@ func TestPolicy(t *testing.T) {
 		t.Error("policy did not return \"done\"")
 	}
 
-	if GetCachePolicy() != UPDATED_POLICY {
+	if GetCachePolicy(client) != UPDATED_POLICY {
 		t.Error("cache has incorrect updated policy")
 	}
 }
 
 func TestStats(t *testing.T) {
-	client := GetClient(t)
+	client := InitClient(t, true)
+	defer client.Disconnect()
 
 	response, _ := client.Stats()
 
@@ -377,19 +424,32 @@ func TestStats(t *testing.T) {
 	}
 }
 
-var client, _ = Connect("127.0.0.1", 3145)
+func InitClient(t *testing.T, authorize bool) (*PaperClient) {
+	client, err := Connect("127.0.0.1", 3145)
 
-func GetClient(t *testing.T) (*PaperClient) {
+	if err != nil {
+		t.Error("Could not connect client")
+	}
+
+	if authorize {
+		response, _ := client.Auth("auth_token")
+
+		if !response.IsOk() {
+			t.Error("Could not authorize client")
+		}
+	}
+
 	client.Wipe()
+
 	return client
 }
 
-func GetCacheSize() (uint64) {
+func GetCacheSize(client *PaperClient) (uint64) {
 	response, _ := client.Stats()
 	return (*response.Data()).MaxSize();
 }
 
-func GetCachePolicy() (uint8) {
+func GetCachePolicy(client *PaperClient) (uint8) {
 	response, _ := client.Stats()
 	return (*response.Data()).Policy();
 }
