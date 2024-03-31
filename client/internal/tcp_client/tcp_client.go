@@ -35,6 +35,7 @@ func (client *TcpClient) GetConn() *net.TCPConn {
 	return client.conn
 }
 
-func (client *TcpClient) Send(sheet *sheet_writer.SheetWriter) {
-	client.conn.Write(sheet.GetBuf())
+func (client *TcpClient) Send(sheet *sheet_writer.SheetWriter) (error) {
+	_, err := client.conn.Write(sheet.GetBuf())
+	return err
 }

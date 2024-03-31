@@ -424,6 +424,29 @@ func TestStats(t *testing.T) {
 	}
 }
 
+func TestReconnect(t *testing.T) {
+	client := InitClient(t, true)
+	defer client.Disconnect()
+
+	pre_disconnect, _ := client.Has("key")
+
+	if !pre_disconnect.IsOk() {
+		t.Error("has returned not ok")
+	}
+
+	client.Disconnect()
+
+	post_disconnect, err := client.Has("key")
+
+	if err != nil {
+		t.Error("an error occurred after disconnect")
+	}
+
+	if !post_disconnect.IsOk() {
+		t.Error("has returned not ok")
+	}
+}
+
 func InitClient(t *testing.T, authorize bool) (*PaperClient) {
 	client, err := Connect("127.0.0.1", 3145)
 
