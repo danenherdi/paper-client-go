@@ -3,7 +3,6 @@ package tcp_client
 import (
 	"net"
 	"errors"
-	"strconv"
 	"internal/sheet_writer"
 )
 
@@ -11,8 +10,8 @@ type TcpClient struct {
 	conn *net.TCPConn
 }
 
-func Connect(host string, port uint32) (*TcpClient, error) {
-	server, err := net.ResolveTCPAddr("tcp", host + ":" + strconv.Itoa(int(port)))
+func Connect(addr string) (*TcpClient, error) {
+	server, err := net.ResolveTCPAddr("tcp", addr)
 
 	if err != nil {
 		return nil, errors.New("Invalid host or port.")

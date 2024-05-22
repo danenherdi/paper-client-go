@@ -16,11 +16,11 @@ type LockableClient struct {
 	lock *sync.Mutex
 }
 
-func Connect(host string, port uint32, size uint32) (*PaperPool, error) {
+func Connect(paper_addr string, size uint32) (*PaperPool, error) {
 	clients := []*LockableClient{}
 
 	for i := uint32(0); i < size; i++ {
-		client, err := paper_client.Connect(host, port)
+		client, err := paper_client.Connect(paper_addr)
 
 		if err != nil {
 			return nil, err

@@ -2,6 +2,7 @@ package paper_client
 
 import (
 	"errors"
+	"strings"
 	"internal/sheet_writer"
 	"internal/sheet_reader"
 	"internal/tcp_client"
@@ -41,8 +42,7 @@ const (
 const MAX_RECONNECT_ATTEMPTS = 3
 
 type PaperClient struct {
-	host string
-	port uint32
+	addr string
 
 	auth_token *string
 	reconnect_attempts uint32
@@ -50,8 +50,15 @@ type PaperClient struct {
 	tcp_client *tcp_client.TcpClient
 }
 
-func Connect(host string, port uint32) (*PaperClient, error) {
-	tcp_client, err := tcp_client.Connect(host, port)
+func Connect(paper_addr string) (*PaperClient, error) {
+	addr_ptr, err := parse_paper_addr(paper_addr)
+
+	if err != nil {
+		return nil, err
+	}
+
+	addr := *addr_ptr
+	tcp_client, err := tcp_client.Connect(addr)
 
 	if err != nil {
 		return nil, err
@@ -61,8 +68,7 @@ func Connect(host string, port uint32) (*PaperClient, error) {
 	var reconnect_attempts uint32 = 0
 
 	client := PaperClient {
-		host,
-		port,
+		addr,
 
 		auth_token,
 		reconnect_attempts,
@@ -203,7 +209,7 @@ func (client *PaperClient) reconnect() (error) {
 		return errors.New("Maximum reconnect attempts reached")
 	}
 
-	tcp_client, err := tcp_client.Connect(client.host, client.port)
+	tcp_client, err := tcp_client.Connect(client.addr)
 
 	if err != nil {
 		return err
@@ -509,4 +515,14 @@ func (client *PaperClient) get_stats_response() (*response.Response[response.Sta
 	}
 
 	return response.New(ok_data, err_data), nil
+}
+
+func parse_paper_addr(paper_addr string) (*string, error) {
+	if !strings.HasPrefix(paper_addr, "paper://") {
+		return nil, errors.New("Invalid paper address.");
+	}
+
+	addr := strings.Replace(paper_addr, "paper://", "", 1)
+
+	return &addr, nil
 }

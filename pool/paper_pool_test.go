@@ -5,7 +5,7 @@ import (
 )
 
 func TestClient(t *testing.T) {
-	pool, _ := Connect("127.0.0.1", 3145, 2)
+	pool, _ := Connect("paper://127.0.0.1:3145", 2)
 	defer pool.Disconnect()
 
 	for i := 0; i < 10; i++ {
@@ -27,7 +27,7 @@ func TestClient(t *testing.T) {
 }
 
 func TestAuthInvalid(t *testing.T) {
-	pool, _ := Connect("127.0.0.1", 3145, 2)
+	pool, _ := Connect("paper://127.0.0.1:3145", 2)
 	defer pool.Disconnect()
 
 	lockable_client := pool.LockableClient()
@@ -43,7 +43,7 @@ func TestAuthInvalid(t *testing.T) {
 }
 
 func TestAuthValid(t *testing.T) {
-	pool, _ := Connect("127.0.0.1", 3145, 2)
+	pool, _ := Connect("paper://127.0.0.1:3145", 2)
 	defer pool.Disconnect()
 
 	pool.Auth("auth_token")

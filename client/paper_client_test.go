@@ -448,7 +448,7 @@ func TestReconnect(t *testing.T) {
 }
 
 func InitClient(t *testing.T, authorize bool) (*PaperClient) {
-	client, err := Connect("127.0.0.1", 3145)
+	client, err := Connect("paper://127.0.0.1:3145")
 
 	if err != nil {
 		t.Error("Could not connect client")
