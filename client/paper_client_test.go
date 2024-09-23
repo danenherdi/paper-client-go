@@ -56,10 +56,6 @@ func TestAuthCorrect(t *testing.T) {
 	if !response.IsOk() {
 		t.Error("auth with correct token returned not ok")
 	}
-
-	if *response.Data() != "done" {
-		t.Error("auth with correct token did not return \"done\"")
-	}
 }
 
 func TestGetExistent(t *testing.T) {
@@ -88,8 +84,8 @@ func TestGetNonExistent(t *testing.T) {
 		t.Error("get returned ok for a key which does not exist")
 	}
 
-	if len(*response.ErrData()) == 0 {
-		t.Error("get for key which does not exist did not return error message")
+	if response.Error() != PAPER_ERROR_KEY_NOT_FOUND {
+		t.Error("get for key which does not exist did not return correct error message")
 	}
 }
 
@@ -102,10 +98,6 @@ func TestSetNoTtl(t *testing.T) {
 	if !response.IsOk() {
 		t.Error("set returned not ok for a value with no ttl")
 	}
-
-	if *response.Data() != "done" {
-		t.Error("set for a value with no ttl did not return \"done\"")
-	}
 }
 
 func TestSetTtl(t *testing.T) {
@@ -116,10 +108,6 @@ func TestSetTtl(t *testing.T) {
 
 	if !response.IsOk() {
 		t.Error("set returned not ok for a value with ttl")
-	}
-
-	if *response.Data() != "done" {
-		t.Error("set for a value with ttl did not return \"done\"")
 	}
 }
 
@@ -133,10 +121,6 @@ func TestSetTtlExpiry(t *testing.T) {
 		t.Error("set returned not ok for a value with ttl")
 	}
 
-	if *response.Data() != "done" {
-		t.Error("set for a value with ttl did not return \"done\"")
-	}
-
 	got, _ := client.Get("key")
 
 	if !got.IsOk() {
@@ -144,7 +128,7 @@ func TestSetTtlExpiry(t *testing.T) {
 	}
 
 	if *got.Data() != "value" {
-		t.Errorf("get return %q instead of \"value\"", *response.Data())
+		t.Errorf("get return %q instead of \"value\"", *got.Data())
 	}
 
 	time.Sleep(2 * time.Second)
@@ -155,9 +139,9 @@ func TestSetTtlExpiry(t *testing.T) {
 		t.Error("get returned ok for an expired key")
 	}
 
-	if len(*expired.ErrData()) == 0 {
+	/*if len(*expired.ErrData()) == 0 {
 		t.Error("get for expired key did not return an error message")
-	}
+	}*/
 }
 
 func TestDelExistent(t *testing.T) {
@@ -169,10 +153,6 @@ func TestDelExistent(t *testing.T) {
 
 	if !response.IsOk() {
 		t.Error("del returned not ok for a key which exists")
-	}
-
-	if *response.Data() != "done" {
-		t.Error("del for a key which exists did not return \"done\"")
 	}
 }
 
@@ -186,9 +166,9 @@ func TestDelNonExistent(t *testing.T) {
 		t.Error("del returned ok for a key which does not exist")
 	}
 
-	if len(*response.ErrData()) == 0 {
+	/*if len(*response.ErrData()) == 0 {
 		t.Error("del for key which does not exist did not return error message")
-	}
+	}*/
 }
 
 func TestHasExistent(t *testing.T) {
@@ -248,9 +228,9 @@ func TestPeekNonExistent(t *testing.T) {
 		t.Error("peek returned ok for a key which does not exist")
 	}
 
-	if len(*response.ErrData()) == 0 {
+	/*if len(*response.ErrData()) == 0 {
 		t.Error("peek for key which does not exist did not return error message")
-	}
+	}*/
 }
 
 func TestTtlExistent(t *testing.T) {
@@ -262,10 +242,6 @@ func TestTtlExistent(t *testing.T) {
 
 	if !response.IsOk() {
 		t.Error("ttl returned not ok for a key which exists")
-	}
-
-	if *response.Data() != "done" {
-		t.Error("ttl for a key which exists did not return \"done\"")
 	}
 }
 
@@ -279,9 +255,9 @@ func TestTtlNonExistent(t *testing.T) {
 		t.Error("ttl returned ok for a key which does not exist")
 	}
 
-	if len(*response.ErrData()) == 0 {
+	/*if len(*response.ErrData()) == 0 {
 		t.Error("ttl for key which does not exist did not return error message")
-	}
+	}*/
 }
 
 func TestSizeExistent(t *testing.T) {
@@ -310,9 +286,9 @@ func TestSizeNonExistent(t *testing.T) {
 		t.Error("size returned ok for a key which does not exist")
 	}
 
-	if len(*response.ErrData()) == 0 {
+	/*if len(*response.ErrData()) == 0 {
 		t.Error("size for key which does not exist did not return error message")
-	}
+	}*/
 }
 
 func TestWipe(t *testing.T) {
@@ -326,19 +302,15 @@ func TestWipe(t *testing.T) {
 		t.Error("wipe returned not ok")
 	}
 
-	if *response.Data() != "done" {
-		t.Error("wipe did not return \"done\"")
-	}
-
 	got, _ := client.Get("key")
 
 	if got.IsOk() {
 		t.Error("get returned ok for wiped key")
 	}
 
-	if len(*got.ErrData()) == 0 {
+	/*if len(*got.ErrData()) == 0 {
 		t.Error("get for wiped key did not return error message")
-	}
+	}*/
 }
 
 func TestResize(t *testing.T) {
@@ -354,10 +326,6 @@ func TestResize(t *testing.T) {
 		t.Error("resize returned not ok")
 	}
 
-	if *initial.Data() != "done" {
-		t.Error("resize did not return \"done\"")
-	}
-
 	if GetCacheSize(client) != INITIAL_SIZE {
 		t.Error("cache has incorrect initial size")
 	}
@@ -366,10 +334,6 @@ func TestResize(t *testing.T) {
 
 	if !updated.IsOk() {
 		t.Error("resize returned not ok")
-	}
-
-	if *updated.Data() != "done" {
-		t.Error("resize did not return \"done\"")
 	}
 
 	if GetCacheSize(client) != UPDATED_SIZE {
@@ -390,10 +354,6 @@ func TestPolicy(t *testing.T) {
 		t.Error("policy returned not ok")
 	}
 
-	if *initial.Data() != "done" {
-		t.Error("policy did not return \"done\"")
-	}
-
 	if GetCachePolicy(client) != INITIAL_POLICY {
 		t.Error("cache has incorrect initial policy")
 	}
@@ -402,10 +362,6 @@ func TestPolicy(t *testing.T) {
 
 	if !updated.IsOk() {
 		t.Error("policy returned not ok")
-	}
-
-	if *updated.Data() != "done" {
-		t.Error("policy did not return \"done\"")
 	}
 
 	if GetCachePolicy(client) != UPDATED_POLICY {

@@ -1,8 +1,29 @@
 package response
 
-type Response[T any] struct {
+const (
+	ERROR_INTERNAL uint8 					= 0
+
+	ERROR_UNREACHABLE_SERVER uint8			= 1
+	ERROR_MAX_CONNECTIONS_EXCEEDED uint8	= 2
+	ERROR_UNAUTHORIZED uint8				= 3
+
+	ERROR_KEY_NOT_FOUND uint8				= 4
+
+	ERROR_ZERO_VALUE_SIZE uint8				= 5
+	ERROR_EXCEEDING_VALUE_SIZE uint8		= 6
+
+	ERROR_ZERO_CACHE_SIZE uint8				= 7
+)
+
+type Response struct {
+	is_ok bool
+	error *uint8
+}
+
+type DataResponse[T any] struct {
+	is_ok bool
 	data *T
-	err_data *string
+	error *uint8
 }
 
 type StatsData struct {
@@ -19,23 +40,40 @@ type StatsData struct {
 	uptime uint64
 }
 
-func New[T any](data *T, err_data *string) *Response[T] {
-	return &Response[T] {
-		data,
-		err_data,
+func New(is_ok bool, error *uint8) *Response {
+	return &Response {
+		is_ok,
+		error,
 	}
 }
 
-func (response *Response[T]) IsOk() bool {
-	return response.err_data == nil
+func NewData[T any](is_ok bool, data *T, error *uint8) *DataResponse[T] {
+	return &DataResponse[T] {
+		is_ok,
+		data,
+		error,
+	}
 }
 
-func (response *Response[T]) Data() *T {
+func (response *Response) IsOk() bool {
+	return response.is_ok
+}
+
+func (response *DataResponse[T]) IsOk() bool {
+	return response.is_ok
+}
+
+func (response *DataResponse[T]) Data() *T {
 	return response.data
 }
 
-func (response *Response[T]) ErrData() *string {
-	return response.err_data
+func (response *Response) Error() uint8 {
+	return *response.error
+}
+
+
+func (response *DataResponse[T]) Error() uint8 {
+	return *response.error
 }
 
 func NewStatsData(
