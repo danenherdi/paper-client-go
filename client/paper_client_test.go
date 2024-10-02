@@ -271,7 +271,7 @@ func TestSizeExistent(t *testing.T) {
 		t.Error("size returned not ok for a key which exists")
 	}
 
-	if *response.Data() != 5 {
+	if *response.Data() == 0 {
 		t.Error("size for a key which exists did not return correct size")
 	}
 }

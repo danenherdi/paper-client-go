@@ -179,7 +179,7 @@ func (client *PaperClient) Ttl(key string, ttl uint32) (*response.Response, erro
 	return client.process(sheet_writer)
 }
 
-func (client *PaperClient) Size(key string) (*response.DataResponse[uint64], error) {
+func (client *PaperClient) Size(key string) (*response.DataResponse[uint32], error) {
 	sheet_writer := sheet_writer.New()
 	sheet_writer.WriteU8(SIZE)
 	sheet_writer.WriteString(key)
@@ -316,7 +316,7 @@ func (client *PaperClient) process_has(sheet_writer *sheet_writer.SheetWriter) (
 	return response, nil
 }
 
-func (client *PaperClient) process_size(sheet_writer *sheet_writer.SheetWriter) (*response.DataResponse[uint64], error) {
+func (client *PaperClient) process_size(sheet_writer *sheet_writer.SheetWriter) (*response.DataResponse[uint32], error) {
 	err := client.tcp_client.Send(sheet_writer)
 
 	if err != nil {
@@ -442,7 +442,7 @@ func (client *PaperClient) get_has_response() (*response.DataResponse[bool], err
 }
 
 
-func (client *PaperClient) get_size_response() (*response.DataResponse[uint64], error) {
+func (client *PaperClient) get_size_response() (*response.DataResponse[uint32], error) {
 	sheet_reader := sheet_reader.New(client.tcp_client)
 	is_ok, err := sheet_reader.ReadBool()
 
@@ -457,10 +457,10 @@ func (client *PaperClient) get_size_response() (*response.DataResponse[uint64], 
 			return nil, err
 		}
 
-		return response.NewData[uint64](is_ok, nil, &error), nil
+		return response.NewData[uint32](is_ok, nil, &error), nil
 	}
 
-	data, err := sheet_reader.ReadU64()
+	data, err := sheet_reader.ReadU32()
 
 	if err != nil {
 		return nil, err
