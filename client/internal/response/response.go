@@ -13,6 +13,8 @@ const (
 	ERROR_EXCEEDING_VALUE_SIZE uint8		= 6
 
 	ERROR_ZERO_CACHE_SIZE uint8				= 7
+
+	ERROR_UNCONFIGURED_POLICY uint8			= 8
 )
 
 type Response struct {
@@ -29,6 +31,7 @@ type DataResponse[T any] struct {
 type StatsData struct {
 	max_size uint64
 	used_size uint64
+	num_objects uint64
 
 	total_gets uint64
 	total_sets uint64
@@ -36,7 +39,10 @@ type StatsData struct {
 
 	miss_ratio float64
 
-	policy uint8
+	policies []string
+	policy string
+	is_auto_policy bool
+
 	uptime uint64
 }
 
@@ -79,6 +85,7 @@ func (response *DataResponse[T]) Error() uint8 {
 func NewStatsData(
 	max_size uint64,
 	used_size uint64,
+	num_objects uint64,
 
 	total_gets uint64,
 	total_sets uint64,
@@ -86,12 +93,16 @@ func NewStatsData(
 
 	miss_ratio float64,
 
-	policy uint8,
+	policies []string,
+	policy string,
+	is_auto_policy bool,
+
 	uptime uint64,
 ) StatsData {
 	return StatsData {
 		max_size,
 		used_size,
+		num_objects,
 
 		total_gets,
 		total_sets,
@@ -99,7 +110,10 @@ func NewStatsData(
 
 		miss_ratio,
 
+		policies,
 		policy,
+		is_auto_policy,
+
 		uptime,
 	}
 }
@@ -110,6 +124,10 @@ func (stats StatsData) MaxSize() uint64 {
 
 func (stats StatsData) UsedSize() uint64 {
 	return stats.used_size
+}
+
+func (stats StatsData) NumObjects() uint64 {
+	return stats.num_objects
 }
 
 func (stats StatsData) TotalGets() uint64 {
@@ -128,8 +146,16 @@ func (stats StatsData) MissRatio() float64 {
 	return stats.miss_ratio
 }
 
-func (stats StatsData) Policy() uint8 {
+func (stats StatsData) Policies() []string {
+	return stats.policies
+}
+
+func (stats StatsData) Policy() string {
 	return stats.policy
+}
+
+func (stats StatsData) IsAutoPolicy() bool {
+	return stats.is_auto_policy
 }
 
 func (stats StatsData) Uptime() uint64 {

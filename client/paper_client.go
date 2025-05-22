@@ -10,13 +10,6 @@ import (
 )
 
 const (
-	POLICY_LFU uint8 = 0
-	POLICY_FIFO uint8 = 1
-	POLICY_LRU uint8 = 2
-	POLICY_MRU uint8 = 3
-)
-
-const (
 	PAPER_ERROR_INTERNAL uint8 					= 0
 
 	PAPER_ERROR_UNREACHABLE_SERVER uint8		= 1
@@ -202,10 +195,10 @@ func (client *PaperClient) Resize(size uint64) (*response.Response, error) {
 	return client.process(sheet_writer)
 }
 
-func (client *PaperClient) Policy(policy uint8) (*response.Response, error) {
+func (client *PaperClient) Policy(policy string) (*response.Response, error) {
 	sheet_writer := sheet_writer.New()
 	sheet_writer.WriteU8(POLICY)
-	sheet_writer.WriteU8(policy)
+	sheet_writer.WriteString(policy)
 
 	return client.process(sheet_writer)
 }
@@ -490,6 +483,12 @@ func (client *PaperClient) get_stats_response() (*response.DataResponse[response
 			return nil, err
 		}
 
+		num_objects, err := sheet_reader.ReadU64()
+
+		if err != nil {
+			return nil, err
+		}
+
 		total_gets, err := sheet_reader.ReadU64()
 
 		if err != nil {
@@ -514,7 +513,31 @@ func (client *PaperClient) get_stats_response() (*response.DataResponse[response
 			return nil, err
 		}
 
-		policy, err := sheet_reader.ReadU8()
+		num_policies, err := sheet_reader.ReadU32()
+
+		if err != nil {
+			return nil, err
+		}
+
+		var policies []string
+
+		for i := uint32(0); i < num_policies; i++ {
+			policy, err := sheet_reader.ReadString()
+
+			if err != nil {
+				return nil, err
+			}
+
+			policies = append(policies, policy)
+		}
+
+		policy, err := sheet_reader.ReadString()
+
+		if err != nil {
+			return nil, err
+		}
+
+		is_auto_policy, err := sheet_reader.ReadBool()
 
 		if err != nil {
 			return nil, err
@@ -529,6 +552,7 @@ func (client *PaperClient) get_stats_response() (*response.DataResponse[response
 		stats := response.NewStatsData(
 			max_size,
 			used_size,
+			num_objects,
 
 			total_gets,
 			total_sets,
@@ -536,7 +560,10 @@ func (client *PaperClient) get_stats_response() (*response.DataResponse[response
 
 			miss_ratio,
 
+			policies,
 			policy,
+			is_auto_policy,
+
 			uptime,
 		)
 

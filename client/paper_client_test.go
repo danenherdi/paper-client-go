@@ -342,8 +342,8 @@ func TestResize(t *testing.T) {
 }
 
 func TestPolicy(t *testing.T) {
-	var INITIAL_POLICY = POLICY_LFU
-	var UPDATED_POLICY = POLICY_LRU
+	var INITIAL_POLICY = "lfu"
+	var UPDATED_POLICY = "lru"
 
 	client := InitClient(t, true)
 	defer client.Disconnect()
@@ -428,7 +428,7 @@ func GetCacheSize(client *PaperClient) (uint64) {
 	return (*response.Data()).MaxSize();
 }
 
-func GetCachePolicy(client *PaperClient) (uint8) {
+func GetCachePolicy(client *PaperClient) (string) {
 	response, _ := client.Stats()
 	return (*response.Data()).Policy();
 }
