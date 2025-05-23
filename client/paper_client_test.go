@@ -139,9 +139,9 @@ func TestSetTtlExpiry(t *testing.T) {
 		t.Error("get returned ok for an expired key")
 	}
 
-	/*if len(*expired.ErrData()) == 0 {
-		t.Error("get for expired key did not return an error message")
-	}*/
+	if expired.Error() != PAPER_ERROR_KEY_NOT_FOUND {
+		t.Error("get for expired key did not return a correct error")
+	}
 }
 
 func TestDelExistent(t *testing.T) {
@@ -166,9 +166,9 @@ func TestDelNonExistent(t *testing.T) {
 		t.Error("del returned ok for a key which does not exist")
 	}
 
-	/*if len(*response.ErrData()) == 0 {
-		t.Error("del for key which does not exist did not return error message")
-	}*/
+	if response.Error() != PAPER_ERROR_KEY_NOT_FOUND {
+		t.Error("del for key which does not exist did not return correct error")
+	}
 }
 
 func TestHasExistent(t *testing.T) {
@@ -228,9 +228,9 @@ func TestPeekNonExistent(t *testing.T) {
 		t.Error("peek returned ok for a key which does not exist")
 	}
 
-	/*if len(*response.ErrData()) == 0 {
-		t.Error("peek for key which does not exist did not return error message")
-	}*/
+	if response.Error() != PAPER_ERROR_KEY_NOT_FOUND {
+		t.Error("peek for key which does not exist did not return correct error")
+	}
 }
 
 func TestTtlExistent(t *testing.T) {
@@ -255,9 +255,9 @@ func TestTtlNonExistent(t *testing.T) {
 		t.Error("ttl returned ok for a key which does not exist")
 	}
 
-	/*if len(*response.ErrData()) == 0 {
-		t.Error("ttl for key which does not exist did not return error message")
-	}*/
+	if response.Error() != PAPER_ERROR_KEY_NOT_FOUND {
+		t.Error("ttl for key which does not exist did not return correct error")
+	}
 }
 
 func TestSizeExistent(t *testing.T) {
@@ -286,9 +286,9 @@ func TestSizeNonExistent(t *testing.T) {
 		t.Error("size returned ok for a key which does not exist")
 	}
 
-	/*if len(*response.ErrData()) == 0 {
-		t.Error("size for key which does not exist did not return error message")
-	}*/
+	if response.Error() != PAPER_ERROR_KEY_NOT_FOUND {
+		t.Error("size for key which does not exist did not return correct error")
+	}
 }
 
 func TestWipe(t *testing.T) {
@@ -308,9 +308,9 @@ func TestWipe(t *testing.T) {
 		t.Error("get returned ok for wiped key")
 	}
 
-	/*if len(*got.ErrData()) == 0 {
-		t.Error("get for wiped key did not return error message")
-	}*/
+	if got.Error() != PAPER_ERROR_KEY_NOT_FOUND {
+		t.Error("get for wiped key did not return correct error")
+	}
 }
 
 func TestResize(t *testing.T) {

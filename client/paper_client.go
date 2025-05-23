@@ -21,7 +21,10 @@ const (
 	PAPER_ERROR_ZERO_VALUE_SIZE uint8			= 5
 	PAPER_ERROR_EXCEEDING_VALUE_SIZE uint8		= 6
 
-	PAPER_ERROR_ZERO_CACHE_SIZE uint8			= 7
+	PAPER_ERROR_UNCONFIGURED_POLICY uint8		= 7
+	PAPER_ERROR_INVALID_POLICY uint8			= 8
+
+	PAPER_ERROR_ZERO_CACHE_SIZE uint8			= 9
 )
 
 const (
@@ -600,6 +603,9 @@ func error_from_sheet(sheet_reader *sheet_reader.SheetReader) (uint8, error) {
 			case 3: return PAPER_ERROR_EXCEEDING_VALUE_SIZE, nil
 
 			case 4: return PAPER_ERROR_ZERO_CACHE_SIZE, nil
+
+			case 5: return PAPER_ERROR_UNCONFIGURED_POLICY, nil
+			case 6: return PAPER_ERROR_INVALID_POLICY, nil
 
 			default: return PAPER_ERROR_INTERNAL, nil
 		}
