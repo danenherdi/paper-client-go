@@ -10,8 +10,8 @@ if err != nil {
   // handle error
 }
 
-client.Set("key", "value", 0)
-got, err := client.Get("key")
+client.Set("hello", "world", 0)
+got, err := client.Get("hello")
 
 if err != nil {
   // handle error
