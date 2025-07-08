@@ -1,21 +1,11 @@
+/*
+ * Copyright (c) Kia Shakiba
+ *
+ * This source code is licensed under the GNU AGPLv3 license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 package response
-
-const (
-	ERROR_INTERNAL uint8 					= 0
-
-	ERROR_UNREACHABLE_SERVER uint8			= 1
-	ERROR_MAX_CONNECTIONS_EXCEEDED uint8	= 2
-	ERROR_UNAUTHORIZED uint8				= 3
-
-	ERROR_KEY_NOT_FOUND uint8				= 4
-
-	ERROR_ZERO_VALUE_SIZE uint8				= 5
-	ERROR_EXCEEDING_VALUE_SIZE uint8		= 6
-
-	ERROR_ZERO_CACHE_SIZE uint8				= 7
-
-	ERROR_UNCONFIGURED_POLICY uint8			= 8
-)
 
 type Response struct {
 	is_ok bool
