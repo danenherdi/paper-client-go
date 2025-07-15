@@ -18,10 +18,15 @@ type DataResponse[T any] struct {
 	error *uint8
 }
 
-type StatsData struct {
+type StatusData struct {
+	pid uint32
+
 	max_size uint64
 	used_size uint64
 	num_objects uint64
+
+	rss uint64
+	hwm uint64
 
 	total_gets uint64
 	total_sets uint64
@@ -72,10 +77,15 @@ func (response *DataResponse[T]) Error() uint8 {
 	return *response.error
 }
 
-func NewStatsData(
+func NewStatusData(
+	pid uint32,
+
 	max_size uint64,
 	used_size uint64,
 	num_objects uint64,
+
+	rss uint64,
+	hwm uint64,
 
 	total_gets uint64,
 	total_sets uint64,
@@ -88,11 +98,16 @@ func NewStatsData(
 	is_auto_policy bool,
 
 	uptime uint64,
-) StatsData {
-	return StatsData {
+) StatusData {
+	return StatusData {
+		pid,
+
 		max_size,
 		used_size,
 		num_objects,
+
+		rss,
+		hwm,
 
 		total_gets,
 		total_sets,
@@ -108,46 +123,46 @@ func NewStatsData(
 	}
 }
 
-func (stats StatsData) MaxSize() uint64 {
-	return stats.max_size
+func (status StatusData) MaxSize() uint64 {
+	return status.max_size
 }
 
-func (stats StatsData) UsedSize() uint64 {
-	return stats.used_size
+func (status StatusData) UsedSize() uint64 {
+	return status.used_size
 }
 
-func (stats StatsData) NumObjects() uint64 {
-	return stats.num_objects
+func (status StatusData) NumObjects() uint64 {
+	return status.num_objects
 }
 
-func (stats StatsData) TotalGets() uint64 {
-	return stats.total_gets
+func (status StatusData) TotalGets() uint64 {
+	return status.total_gets
 }
 
-func (stats StatsData) TotalSets() uint64 {
-	return stats.total_sets
+func (status StatusData) TotalSets() uint64 {
+	return status.total_sets
 }
 
-func (stats StatsData) TotalDels() uint64 {
-	return stats.total_dels
+func (status StatusData) TotalDels() uint64 {
+	return status.total_dels
 }
 
-func (stats StatsData) MissRatio() float64 {
-	return stats.miss_ratio
+func (status StatusData) MissRatio() float64 {
+	return status.miss_ratio
 }
 
-func (stats StatsData) Policies() []string {
-	return stats.policies
+func (status StatusData) Policies() []string {
+	return status.policies
 }
 
-func (stats StatsData) Policy() string {
-	return stats.policy
+func (status StatusData) Policy() string {
+	return status.policy
 }
 
-func (stats StatsData) IsAutoPolicy() bool {
-	return stats.is_auto_policy
+func (status StatusData) IsAutoPolicy() bool {
+	return status.is_auto_policy
 }
 
-func (stats StatsData) Uptime() uint64 {
-	return stats.uptime
+func (status StatusData) Uptime() uint64 {
+	return status.uptime
 }

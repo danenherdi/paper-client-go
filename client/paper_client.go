@@ -54,7 +54,7 @@ const (
 	RESIZE uint8 = 11
 	POLICY uint8 = 12
 
-	STATS uint8 = 13
+	STATUS uint8 = 13
 )
 
 const MAX_RECONNECT_ATTEMPTS = 3
@@ -213,11 +213,11 @@ func (client *PaperClient) Policy(policy string) (*response.Response, error) {
 	return client.process(sheet_writer)
 }
 
-func (client *PaperClient) Stats() (*response.DataResponse[response.StatsData], error) {
+func (client *PaperClient) Status() (*response.DataResponse[response.StatusData], error) {
 	sheet_writer := sheet_writer.New()
-	sheet_writer.WriteU8(STATS)
+	sheet_writer.WriteU8(STATUS)
 
-	return client.process_stats(sheet_writer)
+	return client.process_status(sheet_writer)
 }
 
 func (client *PaperClient) reconnect() (error) {
@@ -344,7 +344,7 @@ func (client *PaperClient) process_size(sheet_writer *sheet_writer.SheetWriter) 
 	return response, nil
 }
 
-func (client *PaperClient) process_stats(sheet_writer *sheet_writer.SheetWriter) (*response.DataResponse[response.StatsData], error) {
+func (client *PaperClient) process_status(sheet_writer *sheet_writer.SheetWriter) (*response.DataResponse[response.StatusData], error) {
 	err := client.tcp_client.Send(sheet_writer)
 
 	if err != nil {
@@ -352,17 +352,17 @@ func (client *PaperClient) process_stats(sheet_writer *sheet_writer.SheetWriter)
 			return nil, err
 		}
 
-		return client.process_stats(sheet_writer)
+		return client.process_status(sheet_writer)
 	}
 
-	response, err := client.get_stats_response()
+	response, err := client.get_status_response()
 
 	if err != nil {
 		if err := client.reconnect(); err != nil {
 			return nil, err
 		}
 
-		return client.process_stats(sheet_writer)
+		return client.process_status(sheet_writer)
 	}
 
 	client.reconnect_attempts = 0
@@ -472,7 +472,7 @@ func (client *PaperClient) get_size_response() (*response.DataResponse[uint32], 
 	return response.NewData(is_ok, &data, nil), nil
 }
 
-func (client *PaperClient) get_stats_response() (*response.DataResponse[response.StatsData], error) {
+func (client *PaperClient) get_status_response() (*response.DataResponse[response.StatusData], error) {
 	sheet_reader := sheet_reader.New(client.tcp_client)
 	is_ok, err := sheet_reader.ReadBool()
 
@@ -481,6 +481,12 @@ func (client *PaperClient) get_stats_response() (*response.DataResponse[response
 	}
 
 	if is_ok {
+		pid, err := sheet_reader.ReadU32()
+
+		if err != nil {
+			return nil, err
+		}
+
 		max_size, err := sheet_reader.ReadU64()
 
 		if err != nil {
@@ -494,6 +500,18 @@ func (client *PaperClient) get_stats_response() (*response.DataResponse[response
 		}
 
 		num_objects, err := sheet_reader.ReadU64()
+
+		if err != nil {
+			return nil, err
+		}
+
+		rss, err := sheet_reader.ReadU64()
+
+		if err != nil {
+			return nil, err
+		}
+
+		hwm, err := sheet_reader.ReadU64()
 
 		if err != nil {
 			return nil, err
@@ -559,10 +577,15 @@ func (client *PaperClient) get_stats_response() (*response.DataResponse[response
 			return nil, err
 		}
 
-		stats := response.NewStatsData(
+		status := response.NewStatusData(
+			pid,
+
 			max_size,
 			used_size,
 			num_objects,
+
+			rss,
+			hwm,
 
 			total_gets,
 			total_sets,
@@ -577,7 +600,7 @@ func (client *PaperClient) get_stats_response() (*response.DataResponse[response
 			uptime,
 		)
 
-		return response.NewData(is_ok, &stats, nil), nil
+		return response.NewData(is_ok, &status, nil), nil
 	}
 
 	error, err := error_from_sheet(sheet_reader)
@@ -586,7 +609,7 @@ func (client *PaperClient) get_stats_response() (*response.DataResponse[response
 		return nil, err
 	}
 
-	return response.NewData[response.StatsData](is_ok, nil, &error), nil
+	return response.NewData[response.StatusData](is_ok, nil, &error), nil
 }
 
 func error_from_sheet(sheet_reader *sheet_reader.SheetReader) (uint8, error) {

@@ -376,14 +376,14 @@ func TestPolicy(t *testing.T) {
 	}
 }
 
-func TestStats(t *testing.T) {
+func TestStatus(t *testing.T) {
 	client := InitClient(t, true)
 	defer client.Disconnect()
 
-	response, _ := client.Stats()
+	response, _ := client.Status()
 
 	if !response.IsOk() {
-		t.Error("stats returned not ok")
+		t.Error("status returned not ok")
 	}
 }
 
@@ -431,11 +431,11 @@ func InitClient(t *testing.T, authorize bool) (*PaperClient) {
 }
 
 func GetCacheSize(client *PaperClient) (uint64) {
-	response, _ := client.Stats()
+	response, _ := client.Status()
 	return (*response.Data()).MaxSize();
 }
 
 func GetCachePolicy(client *PaperClient) (string) {
-	response, _ := client.Stats()
+	response, _ := client.Status()
 	return (*response.Data()).Policy();
 }
