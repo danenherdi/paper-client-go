@@ -10,7 +10,7 @@ package paper_pool
 import (
 	"sync"
 	"sync/atomic"
-	"github.com/Paper-Book/paper-client-go/client"
+	"github.com/PaperCache/paper-client-go/client"
 )
 
 type PaperPool struct {
