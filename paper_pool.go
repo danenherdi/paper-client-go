@@ -5,12 +5,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-package paper_pool
+package paper_client
 
 import (
 	"sync"
 	"sync/atomic"
-	"github.com/PaperCache/paper-client-go/client"
 )
 
 type PaperPool struct {
@@ -19,15 +18,15 @@ type PaperPool struct {
 }
 
 type LockableClient struct {
-	client *paper_client.PaperClient
+	client *PaperClient
 	lock *sync.Mutex
 }
 
-func Connect(paper_addr string, size uint32) (*PaperPool, error) {
+func PoolConnect(paper_addr string, size uint32) (*PaperPool, error) {
 	clients := []*LockableClient{}
 
 	for i := uint32(0); i < size; i++ {
-		client, err := paper_client.Connect(paper_addr)
+		client, err := ClientConnect(paper_addr)
 
 		if err != nil {
 			return nil, err
@@ -78,7 +77,7 @@ func (pool *PaperPool) LockableClient() (*LockableClient) {
 	return client
 }
 
-func (lockable_client *LockableClient) Lock() (*paper_client.PaperClient) {
+func (lockable_client *LockableClient) Lock() (*PaperClient) {
 	lockable_client.lock.Lock()
 	return lockable_client.client
 }

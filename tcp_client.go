@@ -5,19 +5,18 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-package tcp_client
+package paper_client
 
 import (
 	"net"
 	"errors"
-	"internal/sheet_writer"
 )
 
-type TcpClient struct {
+type tcpClient struct {
 	conn *net.TCPConn
 }
 
-func Connect(addr string) (*TcpClient, error) {
+func tcpClientConnect(addr string) (*tcpClient, error) {
 	server, err := net.ResolveTCPAddr("tcp", addr)
 
 	if err != nil {
@@ -30,18 +29,18 @@ func Connect(addr string) (*TcpClient, error) {
 		return nil, errors.New("Could not connect to server.")
 	}
 
-	client := TcpClient {
+	client := tcpClient {
 		conn,
 	}
 
 	return &client, nil
 }
 
-func (client *TcpClient) GetConn() *net.TCPConn {
+func (client *tcpClient) getConn() *net.TCPConn {
 	return client.conn
 }
 
-func (client *TcpClient) Send(sheet *sheet_writer.SheetWriter) (error) {
-	_, err := client.conn.Write(sheet.GetBuf())
+func (client *tcpClient) send(sheet *sheetWriter) (error) {
+	_, err := client.conn.Write(sheet.getBuf())
 	return err
 }

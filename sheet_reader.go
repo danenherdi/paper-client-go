@@ -5,27 +5,26 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-package sheet_reader
+package paper_client
 
 import (
 	"math"
 	"encoding/binary"
-	"internal/tcp_client"
 )
 
-type SheetReader struct {
-	tcp_client *tcp_client.TcpClient
+type sheetReader struct {
+	tcp_client *tcpClient
 }
 
-func New(tcp_client *tcp_client.TcpClient) *SheetReader {
-	return &SheetReader {
+func initSheetReader(tcp_client *tcpClient) *sheetReader {
+	return &sheetReader {
 		tcp_client,
 	}
 }
 
-func (sheet *SheetReader) ReadU8() (uint8, error) {
+func (sheet *sheetReader) readU8() (uint8, error) {
 	data := make([]byte, 1)
-	_, err := sheet.tcp_client.GetConn().Read(data)
+	_, err := sheet.tcp_client.getConn().Read(data)
 
 	if err != nil {
 		return 0, err
@@ -34,9 +33,9 @@ func (sheet *SheetReader) ReadU8() (uint8, error) {
 	return data[0], nil
 }
 
-func (sheet *SheetReader) ReadU32() (uint32, error) {
+func (sheet *sheetReader) readU32() (uint32, error) {
 	data := make([]byte, 4)
-	_, err := sheet.tcp_client.GetConn().Read(data)
+	_, err := sheet.tcp_client.getConn().Read(data)
 
 	if err != nil {
 		return 0, err
@@ -45,9 +44,9 @@ func (sheet *SheetReader) ReadU32() (uint32, error) {
 	return binary.LittleEndian.Uint32(data), nil
 }
 
-func (sheet *SheetReader) ReadU64() (uint64, error) {
+func (sheet *sheetReader) readU64() (uint64, error) {
 	data := make([]byte, 8)
-	_, err := sheet.tcp_client.GetConn().Read(data)
+	_, err := sheet.tcp_client.getConn().Read(data)
 
 	if err != nil {
 		return 0, err
@@ -56,9 +55,9 @@ func (sheet *SheetReader) ReadU64() (uint64, error) {
 	return binary.LittleEndian.Uint64(data), nil
 }
 
-func (sheet *SheetReader) ReadF64() (float64, error) {
+func (sheet *sheetReader) readF64() (float64, error) {
 	data := make([]byte, 8)
-	_, err := sheet.tcp_client.GetConn().Read(data)
+	_, err := sheet.tcp_client.getConn().Read(data)
 
 	if err != nil {
 		return 0, err
@@ -68,8 +67,8 @@ func (sheet *SheetReader) ReadF64() (float64, error) {
 	return math.Float64frombits(bits), nil
 }
 
-func (sheet *SheetReader) ReadBool() (bool, error) {
-	data, err := sheet.ReadU8()
+func (sheet *sheetReader) readBool() (bool, error) {
+	data, err := sheet.readU8()
 
 	if err != nil {
 		return false, err
@@ -78,15 +77,15 @@ func (sheet *SheetReader) ReadBool() (bool, error) {
 	return data == '!', nil
 }
 
-func (sheet *SheetReader) ReadString() (string, error) {
-	length, err := sheet.ReadU32()
+func (sheet *sheetReader) readString() (string, error) {
+	length, err := sheet.readU32()
 
 	if err != nil {
 		return "", err
 	}
 
 	data := make([]byte, length)
-	_, err = sheet.tcp_client.GetConn().Read(data)
+	_, err = sheet.tcp_client.getConn().Read(data)
 
 	if err != nil {
 		return "", err

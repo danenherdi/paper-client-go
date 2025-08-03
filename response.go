@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-package response
+package paper_client
 
 type Response struct {
 	is_ok bool

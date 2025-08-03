@@ -10,7 +10,12 @@ if err != nil {
   // handle error
 }
 
-client.Set("hello", "world", 0)
+err := client.Set("hello", "world", 0)
+
+if err != nil {
+  // handle error
+}
+
 got, err := client.Get("hello")
 
 if err != nil {
