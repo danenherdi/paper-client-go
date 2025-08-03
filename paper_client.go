@@ -13,29 +13,29 @@ import (
 )
 
 const (
-	PING uint8 = 0
-	VERSION uint8 = 1
+	_PING uint8 = 0
+	_VERSION uint8 = 1
 
-	AUTH uint8 = 2
+	_AUTH uint8 = 2
 
-	GET uint8 = 3
-	SET uint8 = 4
-	DEL uint8 = 5
+	_GET uint8 = 3
+	_SET uint8 = 4
+	_DEL uint8 = 5
 
-	HAS uint8 = 6
-	PEEK uint8 = 7
-	TTL uint8 = 8
-	SIZE uint8 = 9
+	_HAS uint8 = 6
+	_PEEK uint8 = 7
+	_TTL uint8 = 8
+	_SIZE uint8 = 9
 
-	WIPE uint8 = 10
+	_WIPE uint8 = 10
 
-	RESIZE uint8 = 11
-	POLICY uint8 = 12
+	_RESIZE uint8 = 11
+	_POLICY uint8 = 12
 
-	STATUS uint8 = 13
+	_STATUS uint8 = 13
 )
 
-const MAX_RECONNECT_ATTEMPTS = 3
+const _MAX_RECONNECT_ATTEMPTS = 3
 
 type PaperClient struct {
 	addr string
@@ -87,14 +87,14 @@ func (client *PaperClient) Disconnect() {
 
 func (client *PaperClient) Ping() (string, error) {
 	writer := initSheetWriter()
-	writer.writeU8(PING)
+	writer.writeU8(_PING)
 
 	return client.processData(writer)
 }
 
 func (client *PaperClient) Version() (string, error) {
 	writer := initSheetWriter()
-	writer.writeU8(VERSION)
+	writer.writeU8(_VERSION)
 
 	return client.processData(writer)
 }
@@ -103,7 +103,7 @@ func (client *PaperClient) Auth(token string) error {
 	client.auth_token = &token
 
 	writer := initSheetWriter()
-	writer.writeU8(AUTH)
+	writer.writeU8(_AUTH)
 	writer.writeString(token)
 
 	return client.process(writer)
@@ -111,7 +111,7 @@ func (client *PaperClient) Auth(token string) error {
 
 func (client *PaperClient) Get(key string) (string, error) {
 	writer := initSheetWriter()
-	writer.writeU8(GET)
+	writer.writeU8(_GET)
 	writer.writeString(key)
 
 	return client.processData(writer)
@@ -119,7 +119,7 @@ func (client *PaperClient) Get(key string) (string, error) {
 
 func (client *PaperClient) Set(key string, value string, ttl uint32) error {
 	writer := initSheetWriter()
-	writer.writeU8(SET)
+	writer.writeU8(_SET)
 	writer.writeString(key)
 	writer.writeString(value)
 	writer.writeU32(ttl)
@@ -129,7 +129,7 @@ func (client *PaperClient) Set(key string, value string, ttl uint32) error {
 
 func (client *PaperClient) Del(key string) error {
 	writer := initSheetWriter()
-	writer.writeU8(DEL)
+	writer.writeU8(_DEL)
 	writer.writeString(key)
 
 	return client.process(writer)
@@ -137,7 +137,7 @@ func (client *PaperClient) Del(key string) error {
 
 func (client *PaperClient) Has(key string) (bool, error) {
 	writer := initSheetWriter()
-	writer.writeU8(HAS)
+	writer.writeU8(_HAS)
 	writer.writeString(key)
 
 	return client.processHas(writer)
@@ -145,7 +145,7 @@ func (client *PaperClient) Has(key string) (bool, error) {
 
 func (client *PaperClient) Peek(key string) (string, error) {
 	writer := initSheetWriter()
-	writer.writeU8(PEEK)
+	writer.writeU8(_PEEK)
 	writer.writeString(key)
 
 	return client.processData(writer)
@@ -153,7 +153,7 @@ func (client *PaperClient) Peek(key string) (string, error) {
 
 func (client *PaperClient) Ttl(key string, ttl uint32) error {
 	writer := initSheetWriter()
-	writer.writeU8(TTL)
+	writer.writeU8(_TTL)
 	writer.writeString(key)
 	writer.writeU32(ttl)
 
@@ -162,7 +162,7 @@ func (client *PaperClient) Ttl(key string, ttl uint32) error {
 
 func (client *PaperClient) Size(key string) (uint32, error) {
 	writer := initSheetWriter()
-	writer.writeU8(SIZE)
+	writer.writeU8(_SIZE)
 	writer.writeString(key)
 
 	return client.processSize(writer)
@@ -170,14 +170,14 @@ func (client *PaperClient) Size(key string) (uint32, error) {
 
 func (client *PaperClient) Wipe() error {
 	writer := initSheetWriter()
-	writer.writeU8(WIPE)
+	writer.writeU8(_WIPE)
 
 	return client.process(writer)
 }
 
 func (client *PaperClient) Resize(size uint64) error {
 	writer := initSheetWriter()
-	writer.writeU8(RESIZE)
+	writer.writeU8(_RESIZE)
 	writer.writeU64(size)
 
 	return client.process(writer)
@@ -185,7 +185,7 @@ func (client *PaperClient) Resize(size uint64) error {
 
 func (client *PaperClient) Policy(policy string) error {
 	writer := initSheetWriter()
-	writer.writeU8(POLICY)
+	writer.writeU8(_POLICY)
 	writer.writeString(policy)
 
 	return client.process(writer)
@@ -193,7 +193,7 @@ func (client *PaperClient) Policy(policy string) error {
 
 func (client *PaperClient) Status() (*PaperStatus, error) {
 	writer := initSheetWriter()
-	writer.writeU8(STATUS)
+	writer.writeU8(_STATUS)
 
 	return client.processStatus(writer)
 }
@@ -201,7 +201,7 @@ func (client *PaperClient) Status() (*PaperStatus, error) {
 func (client *PaperClient) reconnect() (error) {
 	client.reconnect_attempts += 1
 
-	if client.reconnect_attempts > MAX_RECONNECT_ATTEMPTS {
+	if client.reconnect_attempts > _MAX_RECONNECT_ATTEMPTS {
 		return PaperErrorMaxConnectionsExceeded
 	}
 
