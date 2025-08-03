@@ -1,3 +1,3 @@
-module github.com/PaperCache/paper_client_go
+module github.com/PaperCache/paper-client-go
 
 go 1.18
