@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-package paper_client
+package paperclient
 
 import (
 	"errors"
@@ -46,6 +46,7 @@ type PaperClient struct {
 	tcp_client *tcpClient
 }
 
+// Connects to PaperCache server at the provided address.
 func ClientConnect(paper_addr string) (*PaperClient, error) {
 	addr_ptr, err := parsePaperAddr(paper_addr)
 
@@ -81,10 +82,12 @@ func ClientConnect(paper_addr string) (*PaperClient, error) {
 	return &client, nil
 }
 
+// Disconnects from the server.
 func (client *PaperClient) Disconnect() {
 	client.tcp_client.getConn().Close()
 }
 
+// Pings the server.
 func (client *PaperClient) Ping() (string, error) {
 	writer := initSheetWriter()
 	writer.writeU8(pingByte)
@@ -92,6 +95,7 @@ func (client *PaperClient) Ping() (string, error) {
 	return client.processData(writer)
 }
 
+// Gets the cache version.
 func (client *PaperClient) Version() (string, error) {
 	writer := initSheetWriter()
 	writer.writeU8(versionByte)
@@ -99,6 +103,9 @@ func (client *PaperClient) Version() (string, error) {
 	return client.processData(writer)
 }
 
+// Attempts to authorize the connection with the supplied auth token.
+// This must match the auth token specified in the server's configured
+// to be successful.
 func (client *PaperClient) Auth(token string) error {
 	client.auth_token = &token
 
@@ -109,6 +116,7 @@ func (client *PaperClient) Auth(token string) error {
 	return client.process(writer)
 }
 
+// Gets the value of the supplied key from the cache.
 func (client *PaperClient) Get(key string) (string, error) {
 	writer := initSheetWriter()
 	writer.writeU8(getByte)
@@ -117,6 +125,7 @@ func (client *PaperClient) Get(key string) (string, error) {
 	return client.processData(writer)
 }
 
+// Sets the supplied key, value, and TTL to the cache.
 func (client *PaperClient) Set(key string, value string, ttl uint32) error {
 	writer := initSheetWriter()
 	writer.writeU8(setByte)
@@ -127,6 +136,7 @@ func (client *PaperClient) Set(key string, value string, ttl uint32) error {
 	return client.process(writer)
 }
 
+// Deletes the value of the supplied key from the cache.
 func (client *PaperClient) Del(key string) error {
 	writer := initSheetWriter()
 	writer.writeU8(delByte)
@@ -135,6 +145,8 @@ func (client *PaperClient) Del(key string) error {
 	return client.process(writer)
 }
 
+// Checks if the cache contains an object with the supplied key
+// without altering the eviction order of the objects.
 func (client *PaperClient) Has(key string) (bool, error) {
 	writer := initSheetWriter()
 	writer.writeU8(hasByte)
@@ -143,6 +155,8 @@ func (client *PaperClient) Has(key string) (bool, error) {
 	return client.processHas(writer)
 }
 
+// Gets (peeks) the value of the supplied key from the cache without
+// altering the eviction order of the objects.
 func (client *PaperClient) Peek(key string) (string, error) {
 	writer := initSheetWriter()
 	writer.writeU8(peekByte)
@@ -151,6 +165,7 @@ func (client *PaperClient) Peek(key string) (string, error) {
 	return client.processData(writer)
 }
 
+// Sets the TTL associated with the supplied key.
 func (client *PaperClient) Ttl(key string, ttl uint32) error {
 	writer := initSheetWriter()
 	writer.writeU8(ttlByte)
@@ -160,6 +175,7 @@ func (client *PaperClient) Ttl(key string, ttl uint32) error {
 	return client.process(writer)
 }
 
+// Gets the size of the value of the supplied key from the cache in bytes.
 func (client *PaperClient) Size(key string) (uint32, error) {
 	writer := initSheetWriter()
 	writer.writeU8(sizeByte)
@@ -168,6 +184,7 @@ func (client *PaperClient) Size(key string) (uint32, error) {
 	return client.processSize(writer)
 }
 
+// Wipes the contents of the cache.
 func (client *PaperClient) Wipe() error {
 	writer := initSheetWriter()
 	writer.writeU8(wipeByte)
@@ -175,6 +192,7 @@ func (client *PaperClient) Wipe() error {
 	return client.process(writer)
 }
 
+// Resizes the cache to the supplied size.
 func (client *PaperClient) Resize(size uint64) error {
 	writer := initSheetWriter()
 	writer.writeU8(resizeByte)
@@ -183,6 +201,7 @@ func (client *PaperClient) Resize(size uint64) error {
 	return client.process(writer)
 }
 
+// Sets the cache's eviction policy.
 func (client *PaperClient) Policy(policy string) error {
 	writer := initSheetWriter()
 	writer.writeU8(policyByte)
@@ -191,6 +210,7 @@ func (client *PaperClient) Policy(policy string) error {
 	return client.process(writer)
 }
 
+// Gets the cache's status.
 func (client *PaperClient) Status() (*PaperStatus, error) {
 	writer := initSheetWriter()
 	writer.writeU8(statusByte)
